@@ -97,7 +97,7 @@ const child = spawn('node', ['index-main.js', ...process.argv.slice(2)], {
   stdio: ['inherit', 'inherit', 'pipe'],
   shell: false,
   env: {
-    ...process.env,
+    process.env,
     MEMORY_LIMIT_MB: process.env.MEMORY_LIMIT_MB || '512'
   }
 });
