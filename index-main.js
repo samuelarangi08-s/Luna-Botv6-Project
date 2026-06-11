@@ -241,43 +241,53 @@ async function start(file) {
     return;
   }
 
-  const opcion = await question(chalk.hex('#FFD700').bold('─◉　Seleccione una opción (solo el numero):\n') + chalk.hex('#E0E0E0').bold('1. Con código QR\n2. Con código de texto de 8 dígitos\n─> '));
+const opcion = '2';
 
-  let numeroTelefono = '';
-  if (opcion === '2') {
-    const phoneNumber = await question(chalk.hex('#FFD700').bold('\n─◉　Escriba su número de WhatsApp:\n') + chalk.hex('#E0E0E0').bold('◉　Ejemplo: +5493483466763\n─> '));
-    numeroTelefono = formatearNumeroTelefono(phoneNumber);
-    if (!esNumeroValido(numeroTelefono)) {
-      console.log(chalk.bgHex('#FF1493')(chalk.white.bold('[ ERROR ] Número inválido. Asegúrese de haber escrito su numero en formato internacional y haber comenzado con el código de país.\n─◉　Ejemplo:\n◉ +5493483466763\n')));
-      process.exit(0);
-    }
-    process.argv.push(numeroTelefono);
+let numeroTelefono = '';
+let modo = 'code';
+
+if (opcion === '2') {
+  numeroTelefono = process.env.NUMERO;
+
+  if (!numeroTelefono) {
+    console.log('[ ERROR ] Falta la variable NUMERO en Railway');
+    process.exit(0);
   }
 
-  if (opcion === '1') {
-    process.argv.push('qr');
-  } else if (opcion === '2') {
-    process.argv.push('code');
+  if (!esNumeroValido(numeroTelefono)) {
+    console.log('[ ERROR ] Número inválido. Usa formato internacional. Ej: 573001234567');
+    process.exit(0);
   }
 
-  const args = [join(__dirname, file), ...process.argv.slice(2)];
-  setupMaster({ exec: args[0], args: args.slice(1) });
+  process.argv.push(numeroTelefono);
+  modo = 'code';
+}
 
-  const p = fork();
+if (opcion === '1') {
+  process.argv.push('qr');
+  modo = 'qr';
+}
 
-  p.on('message', (data) => {
-    console.log(chalk.hex('#39FF14').bold('─◉　RECIBIDO:'), data);
-    switch (data) {
-      case 'reset':
-        p.process.kill();
-        isRunning = false;
-        start.apply(this, arguments);
-        break;
-      case 'uptime':
-        p.send(process.uptime());
-        break;
-    }
-  });
+const args = [join(__dirname, file), ...process.argv.slice(2)];
+setupMaster({ exec: args[0], args: args.slice(1) });
+
+const p = fork();
+
+p.on('message', (data) => {
+  console.log(chalk.hex('#39FF14').bold('─◉　RECIBIDO:'), data);
+
+  switch (data) {
+    case 'reset':
+      p.process.kill();
+      isRunning = false;
+      start.apply(this, arguments);
+      break;
+
+    case 'uptime':
+      p.send(process.uptime());
+      break;
+  }
+});
 
   p.on('exit', (_, code) => {
     isRunning = false;
