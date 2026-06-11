@@ -58,7 +58,7 @@ async function checkIfNeedsRelaunch() {
 
 const check = await checkIfNeedsRelaunch();
 
-if (check.needsRelaunch) {
+if (false)
   console.log(chalk.yellow('\n⚠️  Detectado inicio sin configuración de memoria óptima'));
   console.log(chalk.cyan(`📊 RAM Servidor: ${(check.totalMemoryMB / 1024).toFixed(2)}GB (${check.totalMemoryMB}MB)`));
   console.log(chalk.green(`🎯 Relanzando con límite: ${(check.memoryLimitMB / 1024).toFixed(2)}GB (${check.memoryLimitMB}MB)\n`));
@@ -93,7 +93,7 @@ if (check.needsRelaunch) {
     
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
     
-    child = spawn('node', args, {
+ require('./index-main.js');
       stdio: ['inherit', 'inherit', 'pipe'],
       shell: false,
       env: {
