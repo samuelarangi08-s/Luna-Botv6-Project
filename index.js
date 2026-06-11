@@ -93,15 +93,15 @@ if (false)
     
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
     
+const env = Object.assign({}, process.env);
+env.MEMORY_LIMIT_MB = process.env.MEMORY_LIMIT_MB || '512';
+
 const child = spawn('node', ['index-main.js', ...process.argv.slice(2)], {
   stdio: ['inherit', 'inherit', 'pipe'],
   shell: false,
-  env: {
-    process.env,
-    MEMORY_LIMIT_MB: process.env.MEMORY_LIMIT_MB || '512'
-  }
+  env
 });
-        ...process.env,
+        const env = Object.assign({}, process.env);
         MEMORY_LIMIT_MB: check.memoryLimitMB.toString(),
         TOTAL_MEMORY_MB: check.totalMemoryMB.toString(),
         RELAUNCHED: 'true',
