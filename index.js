@@ -93,10 +93,14 @@ if (false)
     
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
     
- require('./index-main.js');
-      stdio: ['inherit', 'inherit', 'pipe'],
-      shell: false,
-      env: {
+const child = spawn('node', ['index-main.js', ...process.argv.slice(2)], {
+  stdio: ['inherit', 'inherit', 'pipe'],
+  shell: false,
+  env: {
+    ...process.env,
+    MEMORY_LIMIT_MB: process.env.MEMORY_LIMIT_MB || '512'
+  }
+});
         ...process.env,
         MEMORY_LIMIT_MB: check.memoryLimitMB.toString(),
         TOTAL_MEMORY_MB: check.totalMemoryMB.toString(),
